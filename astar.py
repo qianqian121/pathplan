@@ -171,5 +171,56 @@ def dijkstra(board):
 
     trace_print(board)
 
-dijkstra(board)
+# dijkstra(board)
+
+def greedy(board, start=(0,0), end=(n-1,n-1)):
+    def heuristic(current, goal):
+        return abs(current[0] - goal[0]) + abs(current[1] - goal[1])
+
+    def board_print(board):
+        for r in board:
+            print r
+
+    def trace_print(board):
+        prev = trace[(n - 1, n - 1)]
+        while prev:
+            print(prev)
+            board[prev[0]][prev[1]] = 0
+            prev = trace.get(prev, None)
+        board_print(board)
+
+    def mov(current, next):
+        x = next[0]
+        y = next[1]
+        if x < 0 or x >= n or y < 0 or y >= n:
+            return
+
+        if next not in trace:
+            priority = heuristic(next, end) + board[x][y]
+            pq.push((priority, next))
+            trace[next] = current
+
+    pq = minq()
+    trace = {}
+    trace[start] = None
+    pq.push((0, start))
+
+    while not pq.empty():
+        cur = pq.get()
+        if cur == end:
+            break
+        x = cur[0]
+        y = cur[1]
+        mov((x, y), (x - 1, y - 1))
+        mov((x, y), (x - 1, y))
+        mov((x, y), (x - 1, y + 1))
+        mov((x, y), (x, y - 1))
+        mov((x, y), (x, y + 1))
+        mov((x, y), (x + 1, y - 1))
+        mov((x, y), (x + 1, y))
+        mov((x, y), (x + 1, y + 1))
+
+    trace_print(board)
+
+greedy(board)
 # print('done')
