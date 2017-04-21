@@ -222,5 +222,61 @@ def greedy(board, start=(0,0), end=(n-1,n-1)):
 
     trace_print(board)
 
-greedy(board)
+# greedy(board)
+
+def astar(board, start=(0,0), end=(n-1,n-1)):
+    def heuristic(current, goal):
+        dx = abs(current[0] - goal[0])
+        dy = abs(current[1] - goal[1])
+        return dx + dy - min(dx, dy)
+
+    def board_print(board):
+        for r in board:
+            print r
+
+    def trace_print(board):
+        prev = trace[(n - 1, n - 1)]
+        while prev:
+            print(prev)
+            board[prev[0]][prev[1]] = 0
+            prev = trace.get(prev, None)
+        board_print(board)
+
+    def mov(current, next):
+        x = next[0]
+        y = next[1]
+        if x < 0 or x >= n or y < 0 or y >= n:
+            return
+
+        new_cost = cost_so_far[current] + board[current[0]][current[1]]
+        if next not in cost_so_far or new_cost < cost_so_far[next]:
+            cost_so_far[next] = new_cost
+            prority = new_cost + heuristic(next, end)
+            pq.push((prority, next))
+            trace[next] = current
+
+    pq = minq()
+    trace = {}
+    trace[start] = None
+    cost_so_far = {}
+    cost_so_far[start] = 0
+    pq.push((0, start))
+
+    while not pq.empty():
+        cur = pq.get()
+        if cur == end:
+            break
+        x, y = cur
+        mov((x, y), (x - 1, y - 1))
+        mov((x, y), (x - 1, y))
+        mov((x, y), (x - 1, y + 1))
+        mov((x, y), (x, y - 1))
+        mov((x, y), (x, y + 1))
+        mov((x, y), (x + 1, y - 1))
+        mov((x, y), (x + 1, y))
+        mov((x, y), (x + 1, y + 1))
+
+    trace_print(board)
+
+astar(board)
 # print('done')
