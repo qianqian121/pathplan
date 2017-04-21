@@ -80,5 +80,96 @@ def trace_print():
         prev = trace.get(prev, None)
     board_print()
 
-trace_print()
-print('done')
+# trace_print()
+
+def cost_gen(max_cost=9):
+    global board
+    for i in range(n):
+        for j in range(n):
+            board[i][j] = randint(1, max_cost)
+    board_print()
+
+# cost_gen()
+
+board = [
+    [9, 6, 8, 8, 3, 3, 9, 1],
+    [8, 9, 3, 1, 6, 3, 2, 4],
+    [3, 5, 8, 9, 1, 3, 5, 4],
+    [5, 6, 2, 4, 2, 2, 7, 4],
+    [6, 6, 7, 1, 8, 5, 9, 8],
+    [2, 8, 6, 1, 7, 8, 5, 5],
+    [6, 4, 8, 6, 7, 2, 7, 7],
+    [5, 1, 1, 6, 3, 2, 6, 7]
+]
+
+import heapq as hq
+
+class minq():
+    def __init__(self):
+        self.pq = []
+
+    def push(self, e):
+        hq.heappush(self.pq, e)
+
+    def get(self):
+        return hq.heappop(self.pq)[1]
+
+    def peek(self):
+        return hq.nsmallest(1, self.pq)
+
+    def empty(self):
+        return not self.pq
+
+def dijkstra(board):
+    pq = minq()
+
+    start = (0, 0)
+    cost_so_far = {}
+    cost_so_far[start] = 0
+    trace[start] = None
+    pq.push((0, start))
+
+    def board_print(board):
+        for r in board:
+            print r
+
+    def mov(current, next):
+        x = next[0]
+        y = next[1]
+        if x < 0 or x >= n or y < 0 or y >= n:
+            return
+        new_cost = cost_so_far[current] + board[current[0]][current[1]]
+        if next not in cost_so_far or new_cost < cost_so_far[next]:
+            pq.push((new_cost, next))
+            cost_so_far[next] = new_cost
+            trace[next] = current
+
+    def trace_print(board):
+        prev = trace[(n - 1, n - 1)]
+        while prev:
+            print(prev)
+            board[prev[0]][prev[1]] = 0
+            prev = trace.get(prev, None)
+        board_print(board)
+
+    while not pq.empty():
+        cur = pq.get()
+
+        if cur == (n-1, n-1):
+            break
+
+        x = cur[0]
+        y = cur[1]
+        mov((x, y), (x - 1, y - 1))
+        mov((x, y), (x - 1, y))
+        mov((x, y), (x - 1, y + 1))
+        mov((x, y), (x, y - 1))
+        mov((x, y), (x, y + 1))
+        mov((x, y), (x + 1, y - 1))
+        mov((x, y), (x + 1, y))
+        mov((x, y), (x + 1, y + 1))
+
+    trace_print(board)
+
+dijkstra(board)
+# print('done')
